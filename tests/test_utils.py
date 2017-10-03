@@ -1,6 +1,8 @@
 import unittest
 
 from utils import *
+import resources
+import subprocess
 
 hc = None
 verbose = False
@@ -185,6 +187,89 @@ class VEPTests(unittest.TestCase):
 
     # def test_process_consequences(self):
     #     proc_vds = process_consequences(self.vds)
+
+class ResourceTests(unittest.TestCase):
+
+    @staticmethod
+    def check_gs_file(gs_fname):
+        try:
+            subprocess.check_output(['gsutil', 'ls', gs_fname])
+            return True
+        except subprocess.CalledProcessError:
+            raise AssertionError('File {} is missing!'.format(gs_fname))
+
+    def test_hard_resources(self):
+        for k, v in resources.__dict__.items():
+            if isinstance(v, str) and v.startswith('gs://'):
+                self.check_gs_file(v)
+
+    def test_public_exomes_vds_path(self):
+        for version in RELEASES:
+            for split in (True, False):
+                self.check_gs_file(public_exomes_vds_path(split=split, version=version))
+
+    def test_public_genomes_vds_path(self):
+        for version in RELEASES:
+            for split in (True, False):
+                self.check_gs_file(public_genomes_vds_path(split=split, version=version))
+
+    def test_vqsr_exomes_sites_vds_path(self):
+        for version in HAIL_VERSIONS:
+            self.check_gs_file(vqsr_exomes_sites_vds_path(hail_version=version))
+
+    def test_raw_exomes_vds_path(self):
+        for version in HAIL_VERSIONS:
+            self.check_gs_file(raw_exomes_vds_path(hail_version=version))
+
+    def test_raw_genomes_vds_path(self):
+        for version in HAIL_VERSIONS:
+            self.check_gs_file(raw_genomes_vds_path(hail_version=version))
+
+    def test_raw_exac_vds_path(self):
+        for version in HAIL_VERSIONS:
+            self.check_gs_file(raw_exac_vds_path(hail_version=version))
+
+    def test_hardcalls_exomes_vds_path(self):
+        for version in HAIL_VERSIONS:
+            for split in (True, False):
+                for adj in (True, False):
+                    self.check_gs_file(hardcalls_exomes_vds_path(split=split, adj=adj, hail_version=version))
+
+    def test_hardcalls_genomes_vds_path(self):
+        for version in HAIL_VERSIONS:
+            for split in (True, False):
+                for adj in (True, False):
+                    self.check_gs_file(hardcalls_genomes_vds_path(split=split, adj=adj, hail_version=version))
+
+    def test_metadata_exomes_tsv_path(self):
+        self.check_gs_file(metadata_exomes_tsv_path())
+
+    def test_metadata_genomes_tsv_path(self):
+        self.check_gs_file(metadata_genomes_tsv_path())
+
+    def test_omni_vds_path(self):
+        for version in HAIL_VERSIONS:
+            self.check_gs_file(omni_vds_path(hail_version=version))
+
+    def test_mills_vds_path(self):
+        for version in HAIL_VERSIONS:
+            self.check_gs_file(mills_vds_path(hail_version=version))
+
+    def test_hapmap_vds_path(self):
+        for version in HAIL_VERSIONS:
+            self.check_gs_file(hapmap_vds_path(hail_version=version))
+
+    def test_kgp_high_conf_snvs_vds_path(self):
+        for version in HAIL_VERSIONS:
+            self.check_gs_file(kgp_high_conf_snvs_vds_path(hail_version=version))
+
+    def test_NA12878_vds_path(self):
+        for version in HAIL_VERSIONS:
+            self.check_gs_file(NA12878_vds_path(hail_version=version))
+
+    def test_syndip_vds_path(self):
+        for version in HAIL_VERSIONS:
+            self.check_gs_file(syndip_vds_path(hail_version=version))
 
 
 class SlackResult(unittest.TestResult):
