@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 PACKAGES="slackclient sklearn tabulate pandas scipy statsmodels"
-/home/anaconda2/bin/pip install $PACKAGES
 pip install $PACKAGES
 
 export HAIL_VERSION=0.1
@@ -37,7 +36,7 @@ cd /home/hail/gnomad_hail
 export PYTHONPATH=/home/hail:${SPARK_HOME}/python:$(ls ${SPARK_HOME}/python/lib/py4j-*-src.zip):${HAIL_HOME}/${HAIL_PYTHON_ZIP}
 export SPARK_CLASSPATH=${HAIL_HOME}/${HAIL_JAR}
 
-python tests/test_utils.py
+PYTHONPATH=.:$PYTHONPATH python tests/test_utils.py
 # Use this instead to turn off Slack messages
 # python -m unittest discover &> tests.log
 
